@@ -27,10 +27,6 @@ const { swaggerUi, specs } = require("./middleware/Swagger");
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
-app.get("/", (req, res) => {
-  res.render("index"); // index.ejs을 사용자에게 전달
-});
-
 const namespace = io.of("room");
 namespace.use((socket, next) => {
   // TODO jwt 검증 로직 필요
