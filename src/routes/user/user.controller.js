@@ -2,6 +2,7 @@ const pool = require("../../../middleware/MysqlConnection");
 const { makeResponseFormat } = require("../../../middleware/MakeResponse");
 const { checkMandatory } = require("../../../util/index");
 const { getUserIdFromRequest, extractTokenFromRequest, decodeJWT, createJWT } = require("../../../middleware/JwtService");
+const {isEmpty} = require("../../../util");
 
 exports.getUserList = (req, res) => {
   try {
@@ -68,9 +69,9 @@ exports.getChatRoomList = (req, res) => {
     const sql = `
     select room_id as ROOM_ID,
           room_name as ROOM_NAME,
-          user_id as USER_ID,
+          owner_id as OWNER_ID,
           insert_date as INSERT_DATE
-    from chat_room
+    from room_info
     where 3=3 and 
     user_id = '${user_id}'
   `;
@@ -115,12 +116,12 @@ exports.makeChatRoomList = (req, res) => {
       );
     }
     const makeRoomSql = `
-      insert into chat_room (room_id, user_id, room_name)
+      insert into room_info (room_id, owner_id, room_name)
       values ('${room_id}', '${user_id}', '${room_name}')
     `;
 
     const enterRoomSql = `
-      insert into user_in_chat_room (room_id, user_id)
+      insert into room_user (room_id, user_id)
       values ('${room_id}', '${user_id}')
     `;
 
@@ -169,7 +170,7 @@ exports.enterChatRoom = (req, res) => {
     }
 
     const sql = `
-      insert into user_in_chat_room (room_id, user_id)
+      insert into room_user (room_id, user_id)
       values ('${room_id}', '${user_id}')
     `;
 
@@ -197,7 +198,6 @@ exports.enterChatRoom = (req, res) => {
 };
 
 // 채팅방 나가기
-
 exports.exitChatRoom = (req, res) => {
   try {
     const { user_id, room_id, owner_id } = req.body;
@@ -220,7 +220,7 @@ exports.exitChatRoom = (req, res) => {
 
     // 1. 채팅방에서 현재 아이디 delete
     const exitSql = `
-      delete from user_in_chat_room
+      delete from room_user
       where 3=3 and
       user_id = '${user_id}' and room_id = '${room_id}'
     `;
@@ -228,15 +228,14 @@ exports.exitChatRoom = (req, res) => {
     // 2. 채팅방에 들어간 인원 count select
     const countSql = `
       select count(*) AS MEMBER_COUNT
-      from user_in_chat_room
+      from room_user
       where 3=3 and
-      room_id = '${room_id}' and
-      user_id = '${owner_id}'
+      room_id = '${room_id}'
     `;
 
     // 3. 2의 결과가 0 일 경우, 채팅방 delete
     const deleteRoomSql = `
-      delete from chat_room
+      delete from room_info
       where 3=3 and
       user_id = '${owner_id}' and
       room_id = '${room_id}'
@@ -423,6 +422,7 @@ exports.signup = (req, res) => {
     user_id,
     password,
     user_name,
+    user_email
   }
   const passCheck = checkMandatory(mandatoryKeys)
   if (!passCheck.isPass) {
