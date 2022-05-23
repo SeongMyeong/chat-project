@@ -1,4 +1,4 @@
-module.expors = {
+export default {
   OK: 200,
   CREATED: 201,
   NO_CONTENT: 204,
@@ -11,4 +11,4 @@ module.expors = {
   INTERNAL_SERVER_ERROR: 500,
   SERVICE_UNAVAILABLE: 503,
   DB_ERROR: 600,
-};
+}
