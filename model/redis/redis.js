@@ -2,19 +2,19 @@
  * Redis helper functions
  */
 
-const Redis = require('ioredis')
+const Redis = require('ioredis');
 const redis = new Redis({
   host: '127.0.0.1',
-  port: '6379',
+  port: '6388',
   password: '',
   database: 2,
-})
+});
 const pub = new Redis({
   host: '127.0.0.1',
-  port: '6379',
+  port: '6388',
   password: '',
   database: 2,
-})
+});
 
 // const RedisClustr = require('redis-clustr');
 // const RedisClient = require('redis');
@@ -57,6 +57,6 @@ module.exports = {
   redis: redis,
   pub: pub,
   doRelease: () => {
-    redis.disconnect()
+    redis.disconnect();
   },
-}
+};
